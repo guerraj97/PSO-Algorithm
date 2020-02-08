@@ -1,64 +1,41 @@
-function PSO_algotithm(dim,n_swarm, c1, c2, w,n_iteration, max_run,obj_fun,wdamp)
+function [swarm_p,gbest] = PSO_algotithm(n_varsize,n_swarm,obj_fun,min,max)
 run = 0;
 
-pbest = zeros(n_swarm,dim);
-gbest = 1000000*ones(n_swarm,dim);
-f_pbest = zeros(n_swarm,dim);
+%inicializacion de parametros.
+part.pos = []; %posicion
+part.velocity = []; %velocidad
+part.costo = []; %costo de la funcion
 
-% Generate Random Solution for Particle Position
-X = 100*rand(n_swarm,dim);
-% Generate Random Solution for Particle Position
-V = 100*rand(n_swarm,dim);
+%mejor posicion y mejor costo personal.
+part.b.Pos = [];
+part.b.Costo = [];
+%genero cada particula del swarm.
+swarm_p = repmat(part, n_swarm, 1);
 
-% for ni=1:n_swarm
-% f_pbest(ni,:)=obj_fun(X(ni,:));
-% end
-% [fgbest,igbest]=min(f_pbest);
-% gbest=X(igbest,:)
-% pbest=X;
-% fpbest=f_pbest;
+%global best al inicio
+gbest.Costo = inf; %al ser un problema de minimazion se toma el infinito.
 
 
-while run < max_run
 for i = 1:n_swarm
-    if (f_pbest < pbest)
-    pbest = X;
+    swarm_p(i).pos = unifrnd(min,max,n_varsize); %definiendo la posicion de cada particula.
+
+    %inicializando la velocidad
+    swarm_p(i).velocity = zeros(n_varsize);
+
+    %evaluando la primera iteracion
+    swarm_p(i).costo = obj_fun(swarm_p(i).pos);
+
+    %Buscando una funcion de costo inicial e inicializando la mejor
+    %posicion
+    swarm_p(i).b.Pos = swarm_p(i).pos;
+    swarm_p(i).b.Costo = swarm_p(i).costo;
+
+    swarm_p(i).b.Costo
+    gbest.Costo
+    if swarm_p(i).b.Costo < gbest.Costo
+        %gbest.Cost = swarm_p(i).b.Costo;
+        gbest = swarm_p(i).b;
+        i
     end
-    fpbest(i,:) = min(obj_fun(X(i,:)));
 end
-
-%Actualizar ecuaciones
-for particle = 1:n_swarm
-for dim = 1:dim
-
-%velocidad
-V(particle,:) = w*V(particle,:)+ c1*rand(1,dim).*(pbest(particle,:) - X(particle,:)) ...
-              + c2*rand(1,dim).*(gbest(particle,:) - X(particle,:));
-%posicion
- X(particle,:) = X(particle,:) + V(particle,:);
-end
-
-end
-
-
-
-%
-%actualizar posicion
-
-%             costo(i,:) = myfun(X(i,:));
-%             % Update Personal Best
-%             if costo(i) < pbest_cost(i)
-%                 pbest_position(i,:) = X(i,:);
-%                 pbest_cost(i) = costo(i);
-%             % Update Global Best
-%                 [M,I] = min(pbest_cost);
-%                 gbest = pbest_position(I,:);
-%         bestcost(it) = M;
-%
- run = run + 1
-pbest
-gbest
-%         w = w * wdamp;
-end
-f_pbest;
 end
