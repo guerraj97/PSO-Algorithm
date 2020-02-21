@@ -35,17 +35,17 @@ initParticle = [];
 part.b.Pos = [];
 part.b.Costo = [];
 
+iteration_over = zeros(20,2);
+
 %genero cada particula del swarm.
 swarm_p = repmat(part, n_swarm, 1);
 initParticle = repmat(part, n_swarm, 1);
 %vector para el ploteo
 plot_swarm = zeros(n_swarm,2);
-iteration_over = zeros(maxIteration,1);
 
+for count = 1:20
 %global best al inicio
 gbest.Costo = inf; %al ser un problema de minimazion se toma el infinito.
-figure(3);
-clf;
 for i = 1:n_swarm
     swarm_p(i).pos = unifrnd(Lb,Ub,n_varsize); %definiendo la posicion de cada particula.
     initParticle(i).pos = swarm_p(i).pos;
@@ -66,8 +66,12 @@ end
 
 Status_by_cost = zeros(maxIteration,1);
 
+figure(3);
+clf;
 for iteration = 1:maxIteration
-
+    plot(plot_swarm(:,1),plot_swarm(:,2),'ro')
+    axis([Lb Ub Lb Ub])
+    pause(0.1);
     for pop = 1:n_swarm
 
         %velocidad
@@ -93,16 +97,20 @@ for iteration = 1:maxIteration
          plot_swarm(pop,2) = swarm_p(pop).pos(2);
     end
 
-    plot(plot_swarm(:,1),plot_swarm(:,2),'ro')
-    axis([Lb Ub Lb Ub])
-    pause(0.1);
-    w = w*damp;
     Status_by_cost(iteration) = gbest.Costo;
-    if iteration > 1
-        if Status_by_cost(iteration) == Status_by_cost(iteration - 1)
-            iteration_over(iteration) = iteration;
+    %disp(['iteration ' num2str(iteration) ' BesCosto = ' num2str(Status_by_cost(iteration))])
+end
+disp(['iteration ' num2str(count) ])
+w = w*damp;
+M = min(Status_by_cost);
+for i = 1:maxIteration
+        if Status_by_cost(i) == M
+            iteration_over(count,1) = i;
+            iteration_over(count,2) = M
+            break;
         end
-    end
-    disp(['iteration ' num2str(iteration) ' BesCosto = ' num2str(Status_by_cost(iteration))])
+end
+
+
 end
 end
