@@ -22,7 +22,7 @@
 % initParticle =
 
 %%
-function [swarm_p,gbest,Status_by_cost,initParticle,iteration_over] = PSO_algorithm(n_varsize,n_swarm,obj_fun,Lb,Ub,maxIteration,w,c1,c2,damp)
+function [swarm_p,gbest,Status_by_cost,initParticle,iteration_over] = PSO_algorithm(n_varsize,n_swarm,Lb,Ub,Loop,w,c1,c2,damp)
 %run = 0;
 
 %inicializacion de parametros.
@@ -35,15 +35,19 @@ initParticle = [];
 part.b.Pos = [];
 part.b.Costo = [];
 
-iteration_over = zeros(20,2);
+iteration_over = zeros(Loop,3);
 
+maxIteration = 200;
 %genero cada particula del swarm.
 swarm_p = repmat(part, n_swarm, 1);
 initParticle = repmat(part, n_swarm, 1);
 %vector para el ploteo
 plot_swarm = zeros(n_swarm,2);
 
-for count = 1:20
+
+for count = 1:Loop
+stat = 1;
+var = w;
 %global best al inicio
 gbest.Costo = inf; %al ser un problema de minimazion se toma el infinito.
 for i = 1:n_swarm
@@ -66,12 +70,12 @@ end
 
 Status_by_cost = zeros(maxIteration,1);
 
-figure(3);
-clf;
+% figure(3);
+% clf;
 for iteration = 1:maxIteration
-    plot(plot_swarm(:,1),plot_swarm(:,2),'ro')
-    axis([Lb Ub Lb Ub])
-    pause(0.1);
+%     plot(plot_swarm(:,1),plot_swarm(:,2),'ro')
+%     axis([Lb Ub Lb Ub])
+%     pause(0.1);
     for pop = 1:n_swarm
 
         %velocidad
@@ -98,19 +102,29 @@ for iteration = 1:maxIteration
     end
 
     Status_by_cost(iteration) = gbest.Costo;
+    if Status_by_cost(iteration) < -959.6407
+            iteration_over(count,1) = iteration;
+            iteration_over(count,2) = Status_by_cost(iteration);
+            iteration_over(count,3) = var;
+            stat = 0;
+            break;
+    end
     %disp(['iteration ' num2str(iteration) ' BesCosto = ' num2str(Status_by_cost(iteration))])
 end
 disp(['iteration ' num2str(count) ])
-w = w*damp;
+
+if stat == 1
 M = min(Status_by_cost);
 for i = 1:maxIteration
         if Status_by_cost(i) == M
             iteration_over(count,1) = i;
-            iteration_over(count,2) = M
+            iteration_over(count,2) = M;
+            iteration_over(count,3) = var;
             break;
         end
 end
-
+end
+w = w*damp;
 
 end
 end
